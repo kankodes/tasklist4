@@ -28,22 +28,18 @@ function addTask() {
     return;
   }
 
-  const tasks = document.getElementById('tasks');
+  const task = {
+    id: Date.now(),
+    name,
+    date,
+    time,
+    completed: false
+  };
 
-  const taskItem = document.createElement('div');
-  taskItem.className = 'task-item';
-
-  taskItem.innerHTML = `
-    <input type="checkbox" onchange="toggleComplete(this)">
-    <label>${name}</label>
-    <div class="task-time" onclick="editTime(this)">
-      <span>${formatTime(time)}</span>
-      <span>${formatDate(date)}</span>
-    </div>
-    <button class="delete-btn" onclick="deleteTask(this)">delete</button>
-  `;
-
-  tasks.appendChild(taskItem);
+  const tasks = getTasks();
+  tasks.push(task);
+  saveTasks(tasks);
+  renderTasks();
   closePopup();
   clearFields();
 }
@@ -54,20 +50,33 @@ function clearFields() {
   document.getElementById('taskTime').value = '';
 }
 
-function deleteTask(button) {
-  button.parentElement.remove();
+function deleteTask(id) {
+  let tasks = getTasks();
+  tasks = tasks.filter(task => task.id !== id);
+  saveTasks(tasks);
+  renderTasks();
 }
 
-function editTime(div) {
+function editTime(id) {
   const time = prompt("Enter new time (HH:MM)", "11:00");
   const date = prompt("Enter new date (YYYY-MM-DD)", new Date().toISOString().slice(0,10));
 
   if (time && date) {
-    div.innerHTML = `
-      <span>${formatTime(time)}</span>
-      <span>${formatDate(date)}</span>
-    `;
+    const tasks = getTasks();
+    const task = tasks.find(t => t.id === id);
+    task.time = time;
+    task.date = date;
+    saveTasks(tasks);
+    renderTasks();
   }
+}
+
+function toggleComplete(id) {
+  const tasks = getTasks();
+  const task = tasks.find(t => t.id === id);
+  task.completed = !task.completed;
+  saveTasks(tasks);
+  renderTasks();
 }
 
 function formatTime(t) {
@@ -89,11 +98,37 @@ function formatDate(d) {
   return selected.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-function toggleComplete(checkbox) {
-  const task = checkbox.parentElement;
-  if (checkbox.checked) {
-    task.classList.add('completed');
-  } else {
-    task.classList.remove('completed');
-  }
+function getTasks() {
+  return JSON.parse(localStorage.getItem('tasks')) || [];
 }
+
+function saveTasks(tasks) {
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function renderTasks() {
+  const tasksContainer = document.getElementById('tasks');
+  tasksContainer.innerHTML = '';
+
+  const tasks = getTasks();
+  tasks.forEach(task => {
+    const taskItem = document.createElement('div');
+    taskItem.className = 'task-item';
+    if (task.completed) taskItem.classList.add('completed');
+
+    taskItem.innerHTML = `
+      <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleComplete(${task.id})">
+      <label>${task.name}</label>
+      <div class="task-time" onclick="editTime(${task.id})">
+        <span>${formatTime(task.time)}</span>
+        <span>${formatDate(task.date)}</span>
+      </div>
+      <button class="delete-btn" onclick="deleteTask(${task.id})">delete</button>
+    `;
+
+    tasksContainer.appendChild(taskItem);
+  });
+}
+
+// On page load
+renderTasks();
