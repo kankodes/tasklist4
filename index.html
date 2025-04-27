@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kanhiya's Tasks</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="task-container">
+    <h1>hi, kanhiya! 👋🏻<br>here are your tasks:</h1>
+    <p class="current-time" id="currentTime"></p>
+    <div class="add-task" onclick="openPopup()">+ add new task</div>
+    
+    <div id="tasks"></div>
+  </div>
+
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <h2>Add New Task</h2>
+      <input type="text" id="taskName" placeholder="Task Name">
+      <input type="date" id="taskDate">
+      <input type="time" id="taskTime">
+      <button onclick="addTask()">Done</button>
+      <button onclick="closePopup()" class="close-btn">Cancel</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
