@@ -3,7 +3,7 @@ function updateTime() {
   const now = new Date();
   const dateString = now.toLocaleString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric',
-    hour: 'numeric', minute: 'numeric'
+    hour: '2-digit', minute: '2-digit'
   });
   document.getElementById('currentTime').innerText = `it’s ${dateString} right now.`;
 }
@@ -34,7 +34,7 @@ function addTask() {
   taskItem.className = 'task-item';
 
   taskItem.innerHTML = `
-    <input type="checkbox">
+    <input type="checkbox" onchange="toggleComplete(this)">
     <label>${name}</label>
     <div class="task-time" onclick="editTime(this)">
       <span>${formatTime(time)}</span>
@@ -87,4 +87,13 @@ function formatDate(d) {
   const selected = new Date(d);
   if (today.toDateString() === selected.toDateString()) return "Today";
   return selected.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+function toggleComplete(checkbox) {
+  const task = checkbox.parentElement;
+  if (checkbox.checked) {
+    task.classList.add('completed');
+  } else {
+    task.classList.remove('completed');
+  }
 }
